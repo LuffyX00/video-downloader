@@ -26,6 +26,8 @@ class Settings(BaseSettings):
 
     allowed_hosts: list[str] = ["youtube.com", "youtu.be", "youtube-nocookie.com"]
 
+    cookies_file: Path | None = None
+
     @property
     def is_production(self) -> bool:
         return self.environment.lower() == "production"

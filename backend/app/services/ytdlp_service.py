@@ -8,6 +8,8 @@ size as the stream YouTube would play in the browser.
 from __future__ import annotations
 
 import logging
+import shutil
+import tempfile
 from pathlib import Path
 from typing import Any, Callable
 
@@ -110,16 +112,24 @@ class _ProgressTracker:
 class YtDlpService:
     def __init__(self, settings: Settings):
         self._settings = settings
+        self._cookies: str | None = None
+        if settings.cookies_file and settings.cookies_file.exists():
+            # yt-dlp rewrites the cookie file, and Render secret files are read-only, so copy it.
+            target = Path(tempfile.gettempdir()) / "yt_cookies.txt"
+            shutil.copyfile(settings.cookies_file, target)
+            self._cookies = str(target)
 
-    @staticmethod
-    def _base_opts() -> dict[str, Any]:
-        return {
+    def _base_opts(self) -> dict[str, Any]:
+        opts: dict[str, Any] = {
             "quiet": True,
             "no_warnings": True,
             "noplaylist": True,
             "socket_timeout": 20,
             "retries": 3,
         }
+        if self._cookies:
+            opts["cookiefile"] = self._cookies
+        return opts
 
     # -------- metadata
     def extract_info(self, url: str) -> VideoInfo:

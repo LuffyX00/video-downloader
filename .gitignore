@@ -7,3 +7,4 @@ __pycache__/
 backend/downloads/
 .pytest_cache/
 .env.example
+backend/bin/

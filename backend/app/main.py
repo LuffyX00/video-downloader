@@ -14,8 +14,15 @@ from app.exceptions import AppError
 from app.services.job_manager import JobManager
 from app.services.ytdlp_service import YtDlpService
 
+import os
+from pathlib import Path
+
+
 logger = logging.getLogger(__name__)
 
+BIN_DIR = Path(__file__).resolve().parent.parent / "bin"
+if BIN_DIR.is_dir():
+    os.environ["PATH"] = f"{BIN_DIR}{os.pathsep}{os.environ.get('PATH', '')}"
 
 async def _cleanup_loop(manager: JobManager, interval: int) -> None:
     while True:
